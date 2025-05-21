@@ -21,7 +21,10 @@ add_subdirectory(vendor/sdl)
 find_package(OpenGL)
 find_package(glfw3 REQUIRED)
 
-add_executable(NumericalMethodsInCpp main.cpp)
+add_executable(NumericalMethodsInCpp main.cpp
+        src/phugoid/phugoid_dynamics.hpp
+        src/sim.hpp
+        src/systems.hpp)
 
 target_include_directories(NumericalMethodsInCpp
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
