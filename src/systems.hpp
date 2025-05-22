@@ -7,9 +7,9 @@
 namespace Systems {
     class ISystem {
     public:
-        virtual ~ISystem() {}
-        virtual auto update(float t, const Eigen::VectorXd x, const Eigen::VectorXd& u) -> Eigen::VectorXd = 0;
-        virtual auto output(float t, const Eigen::VectorXd x, const Eigen::VectorXd& u) -> Eigen::MatrixXd = 0;
+        virtual ~ISystem() = default;
+        virtual auto update(float t, Eigen::VectorXd x, const std::optional<Eigen::VectorXd> &u) -> Eigen::VectorXd = 0; // Pure Virtual
+        virtual auto output(float t, Eigen::VectorXd x, const std::optional<Eigen::VectorXd> &u) -> Eigen::MatrixXd = 0; // Pure Virtual
     };
 }
 #endif //SYSTEMS_HPP
