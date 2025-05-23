@@ -14,7 +14,7 @@ namespace Simulator {
     };
 
     inline auto to_sim_time_vector(const double dt, const double t_final) -> Eigen::VectorXd {
-        return Eigen::VectorXd::LinSpaced(round(dt/t_final), 0, t_final);
+        return Eigen::VectorXd::LinSpaced(round(t_final/dt), 0, t_final);
     };
 
     inline auto to_sim_time_vector(const SimulationParams& sim_params) -> Eigen::VectorXd {
@@ -36,11 +36,16 @@ namespace Simulator {
          * @param u forcing of the system
          * @return simulation results
          */
-        virtual auto simulate(const Eigen::VectorXd& x_o, const std::optional<Eigen::VectorXd> &u) const ->  Eigen::VectorXd = 0;
+        virtual auto simulate(const Eigen::VectorXd& x_o, const std::optional<Eigen::VectorXd> &u) const -> Eigen::MatrixXd = 0;
+
+        auto get_sim_results()  -> Eigen::MatrixXd {
+            return sim_results_;
+        }
 
     protected:
         SimulationParams params_;
         Eigen::VectorXd t_series_;
+        Eigen::MatrixXd sim_results_ {};
         SystemPtr system_;
     };
 
@@ -48,25 +53,25 @@ namespace Simulator {
     public:
         explicit EulerODESimulator(SystemPtr &system, const SimulationParams& params): ISimulator(system, params) {};
         ~EulerODESimulator() override = default;
-        auto simulate(const Eigen::VectorXd &x_o, const std::optional<Eigen::VectorXd> &u) const -> Eigen::VectorXd override {
-            auto n_dims = x_o.rows();
-            auto m_slots = t_series_.rows();
-            Eigen::VectorXd result = Eigen::VectorXd::Zero(m_slots, n_dims);
-            Eigen::VectorXd x_cache = x_o;
-            result(0) = x_cache.value();
-            for (int index = 1; index < m_slots; ++index) {
-                params_.dt * system_->update(t_series_(index), x_cache, u);
+        auto simulate(const Eigen::VectorXd &x_o, const std::optional<Eigen::VectorXd> &u) const -> Eigen::MatrixXd override {
+            Eigen::MatrixXd result = Eigen::MatrixXd::Zero(x_o.size(), t_series_.size());
+            result.col(0) = x_o;
+            auto x_state = x_o;
+            for (int index = 0; index < t_series_.rows(); ++index) {
+                x_state = x_state + (system_->update(index, x_state, u) * params_.dt);
+                Eigen::VectorXd temp = x_state;
+                result.col(index) = temp;
             }
-            return  result;
+            return result;
         };
     };
 
     class TestSystem final : public Systems::ISystem {
     public:
-        auto update(float t, const Eigen::VectorXd x, const std::optional<Eigen::VectorXd> &u) -> Eigen::VectorXd override {
+        auto update(float t, Eigen::VectorXd &x, const std::optional<Eigen::VectorXd> &u) -> Eigen::VectorXd override {
             return Eigen::VectorXd::Ones(4, 1);
         }
-        auto output(float t, Eigen::VectorXd x, const std::optional<Eigen::VectorXd> &u) -> Eigen::MatrixXd override {
+        auto output(float t, Eigen::VectorXd &x, const std::optional<Eigen::VectorXd> &u) -> Eigen::MatrixXd override {
             return  x;
         };
     };
@@ -74,6 +79,9 @@ namespace Simulator {
     inline auto test_simulation() -> void {
         std::unique_ptr<Systems::ISystem> t_system = std::make_unique<TestSystem>();
         EulerODESimulator ode_solver(t_system, {.dt = 0.01, .t_final = 1.0});
+        Eigen::VectorXd x_o = Eigen::VectorXd{{1, 2, 3, 4}};
+        std::cout << ode_solver.simulate(x_o, {}) << std::endl;
+        // auto sim_results = ode_solver.get_sim_results().get();
     }
 
 

@@ -24,7 +24,11 @@ find_package(glfw3 REQUIRED)
 add_executable(NumericalMethodsInCpp main.cpp
         src/phugoid/phugoid_dynamics.hpp
         src/sim.hpp
-        src/systems.hpp)
+        src/systems.hpp
+        src/ui/mvc_demo/shopping_cart_model.hpp
+        src/ui/mvc_demo/shopping_cart_controller.hpp
+        src/ui/mvc_demo/shopping_cart_view.hpp
+        src/dynamics/double_integrator_dynamics.hpp)
 
 target_include_directories(NumericalMethodsInCpp
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
