@@ -41,6 +41,7 @@ namespace Dashboard {
                 static_cast<SDL_WindowFlags>(SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE|SDL_WINDOW_HIGH_PIXEL_DENSITY)
             };
             constexpr int window_center_flag{SDL_WINDOWPOS_CENTERED};
+            SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
             window_ = SDL_CreateWindow(name_.c_str(), width_, height_, window_flags);
         }
 

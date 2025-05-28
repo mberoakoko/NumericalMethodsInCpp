@@ -6,6 +6,27 @@
 #include <bits/stdc++.h>
 #include "src/systems.hpp"
 #include "src/dynamics/double_integrator_dynamics.hpp"
+#include "src/ui/dashboard_application.hpp"
+#include <unistd.h>
+
+struct Something {
+    std::string name_;
+    explicit Something(std::string name) : name_(name) {
+        std::cout << "Constructing "<< name << std::endl;
+    }
+    ~Something() {
+        std::cout << "Destructing "<< name_ << std::endl;
+    }
+
+    Something(const Something &other) {
+        std::cout << "Copy constructor" << std::endl;
+    }
+
+    Something &operator=(const Something &other) {
+        std::cout << "Copy assignment operator" << std::endl;
+        return *this;
+    }
+};
 
 auto exploring_eigen_functions() {
     Eigen::VectorXd mu = Eigen::VectorXd::Ones(10);
@@ -35,11 +56,19 @@ auto eigen_library_combined_with_ranges_library() {
 
 }
 
+auto some_important_task(const Something& something) {
+    std::cout<<"Within the scope of " << __FUNCTION__ << std::endl;
+    Something inner = something;
+    return inner;
+}
+
 int main() {
-    Simulator::test_simulation();
+    // Simulator::test_simulation();
     // eigen_library_combined_with_ranges_library();
-    std::unique_ptr<Systems::ISystem> double_intergrator = std::make_unique<Dynamics::DoubleIntegrator>();
-    Eigen::VectorXd x_state = Eigen::VectorXd::Ones(2);
-    Simulator::test_simulation();
+    // std::unique_ptr<Systems::ISystem> double_intergrator = std::make_unique<Dynamics::DoubleIntegrator>();
+    // Eigen::VectorXd x_state = Eigen::VectorXd::Ones(2);
+    Simulator::test_double_integrator_simulation();
+    // Dashboard::Application application{};
+    // application.run();
     return 0;
 }

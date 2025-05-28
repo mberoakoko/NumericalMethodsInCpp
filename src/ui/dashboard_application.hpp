@@ -61,16 +61,12 @@ namespace Dashboard {
                 ImGui::NewFrame();
 
                 // Render "some panel".
-                ImGui::Begin("Some panel", &m_show_some_panel);
-                ImGui::Text("Hello World");
-                ImGui::End();
-
+                ImGui::ShowDemoWindow();
                 ImGui::Render();
                 SDL_SetRenderDrawColor(
                     window_->renderer(), 100, 100, 100, 100);
-                SDL_RenderClear(window_->renderer());
-                SDL_RenderPresent(window_->renderer());
 
+                SDL_RenderClear(window_->renderer());;
                 ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), window_->renderer());
                 SDL_RenderPresent(window_->renderer());
             }
