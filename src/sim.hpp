@@ -7,6 +7,7 @@
 #include <bits/stdc++.h>
 #include <eigen3/Eigen/Core>
 #include "src/systems.hpp"
+#include "src/dynamics/double_integrator_dynamics.hpp"
 namespace Simulator {
     struct SimulationParams {
         double dt;
@@ -57,6 +58,7 @@ namespace Simulator {
             Eigen::MatrixXd result = Eigen::MatrixXd::Zero(x_o.size(), t_series_.size());
             result.col(0) = x_o;
             auto x_state = x_o;
+            std::ranges::for_each(result.colwise(), [](auto item){});
             for (int index = 0; index < t_series_.rows(); ++index) {
                 x_state = x_state + (system_->update(index, x_state, u) * params_.dt);
                 Eigen::VectorXd temp = x_state;
@@ -81,7 +83,17 @@ namespace Simulator {
         EulerODESimulator ode_solver(t_system, {.dt = 0.01, .t_final = 1.0});
         Eigen::VectorXd x_o = Eigen::VectorXd{{1, 2, 3, 4}};
         std::cout << ode_solver.simulate(x_o, {}) << std::endl;
+
         // auto sim_results = ode_solver.get_sim_results().get();
+    }
+
+    inline auto test_double_integrator_simulation() -> void {
+        std::unique_ptr<Systems::ISystem> d_integrator_sys = std::make_unique<Dynamics::DoubleIntegrator>();
+        EulerODESimulator ode_solver {d_integrator_sys, {.dt = 0.01, .t_final = 1.0}};
+        Eigen::VectorXd x_o = Eigen::VectorXd{ {0, 0} };
+        const Eigen::MatrixXd sim_results = ode_solver.simulate(x_o, {});
+        std::cout << sim_results << std::endl;
+        // std::cout <<"Cols " << sim_results.s << " | Rows " << sim_results.rows() << std::endl;
     }
 
 
